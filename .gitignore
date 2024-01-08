@@ -13,6 +13,8 @@
 *.png
 *.eps
 *.pdf
+*.jpg
+*.tif
 
 Data/runoff_by_state_Mar16_knnboot_1t.mat
 Data/runoff_by_state_06Oct2021.mat

@@ -271,7 +271,7 @@ end
 set(findall(gcf,'-property','FontSize'),'FontSize',8)
 set(leg,'FontSize',6.5,'Position', leg.Position + [0.04 0.05 0 0])
 cd(strcat(dir, 'Plots'))
-saveas(gcf, 'Figures/mainbody/fig3_barplot.pdf')
+exportgraphics(gcf, 'Figures/mainbody/fig3_barplot.pdf', 'ContentType', 'vector'); 
 saveas(gcf, 'Figures/mainbody/fig3_barplot.eps')
 saveas(gcf, 'Figures/mainbody/fig3_barplot.jpg')
 
@@ -354,7 +354,7 @@ set(leg2,'Box','off','Position', leg2.Position + [0 0.2 0 0]);
 % save figure as .pdf and .eps and update fontsize
 set(findall(gcf,'-property','FontSize'),'FontSize',8)
 cd(strcat(dir, 'Plots'))
-saveas(gcf, 'Figures/mainbody/fig4_shortagecosts.pdf')
+exportgraphics(gcf, 'Figures/mainbody/fig4_shortagecosts.pdf', 'ContentType', 'vector'); 
 saveas(gcf, 'Figures/mainbody/fig4_shortagecosts.eps')
 saveas(gcf, 'Figures/mainbody/fig4_shortagecosts.jpg')
 
@@ -465,7 +465,7 @@ title({['Simulations with Greatest Cost Savings for Flexible ' ...
 % save figure as .pdf and .eps and update fontsize
 set(findall(gcf,'-property','FontSize'),'FontSize',8)
 cd(strcat(dir, 'Plots'))
-saveas(gcf, 'Figures/mainbody/fig5_boxplot.pdf')
+exportgraphics(gcf, 'Figures/mainbody/fig5_boxplot.pdf', 'ContentType', 'vector'); 
 saveas(gcf, 'Figures/mainbody/fig5_boxplot.eps')
 saveas(gcf, 'Figures/mainbody/fig5_boxplot.jpg')
 
@@ -738,7 +738,7 @@ end
 set(findall(gcf,'-property','FontSize'),'FontSize',8)
 set(leg,'FontSize',6.5,'Position', leg.Position + [0.04 0.05 0 0])
 cd(strcat(dir, 'Plots'))
-saveas(gcf, 'Figures/mainbody/fig6_barplot.pdf')
+exportgraphics(gcf, 'Figures/mainbody/fig6_barplot.pdf', 'ContentType', 'vector'); 
 saveas(gcf, 'Figures/mainbody/fig6_barplot.eps')
 saveas(gcf, 'Figures/mainbody/fig6_barplot.jpg')
 
@@ -1257,7 +1257,7 @@ for d=1:length(discounts)
         end
         
         
-        if discountCost == 1 || disc == "0" % use discounted costs
+        if disc == "0" % use discounted costs
             % Dam Cost Time: select associated simulations for given P state
             damCostPnowFlex_adapt = damCost_adapt(ind_P_adapt,:,1);
             damCostPnowFlex_nonadapt = damCost_nonadapt(ind_P_adapt,:,1);
@@ -1406,7 +1406,7 @@ end
 % save figure as .pdf and .eps and update fontsize
 set(findall(gcf,'-property','FontSize'),'FontSize',8)
 cd(strcat(dir, 'Plots'))
-saveas(gcf, 'Figures/mainbody/fig7_disc.pdf')
+exportgraphics(gcf, 'Figures/mainbody/fig7_disc.pdf', 'ContentType', 'vector'); 
 saveas(gcf, 'Figures/mainbody/fig7_disc.eps')
 saveas(gcf, 'Figures/mainbody/fig7_disc.jpg')
 
@@ -1698,7 +1698,7 @@ end
     % save figure as .pdf and .eps and update fontsize
     set(findall(gcf,'-property','FontSize'),'FontSize',8)
     cd(strcat(dir, 'Plots'))
-    saveas(gcf, 'Figures/mainbody/fig8_scatter.pdf')
+    exportgraphics(gcf, 'Figures/mainbody/fig8_scatter.pdf', 'ContentType', 'vector'); 
     saveas(gcf, 'Figures/mainbody/fig8_scatter.eps')
     saveas(gcf, 'Figures/mainbody/fig8_scatter.jpg')
 

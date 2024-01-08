@@ -1,5 +1,4 @@
-%% DOCUMENTATION:
-% This is V6 of multiflex_sdp_climate_StaticFlex_DetT.m (date: 11/02/2021)
+%% Infrastructure Planning SDP
 
 % DESCRIPTION:
 % This script parallels the structure of the script sdp_climate.m. The
@@ -33,7 +32,7 @@
 % option). This is useful when selecting runParam.forwardSim = true.
 
 % NOTE: 
-% As calculation of the optimized reservoir operations via DDP 
+% As calculation of the optimized reservoir operations via SDP 
 % is computationally time intensive,it is recommended to run the script
 % runParam.optReservoir = true only when runParam.calcShortage = false.)
 
@@ -319,7 +318,7 @@ if runParam.calcTmat
     T_name = strcat('T_Temp_Precip_', runParam.setPathway) % save a different transition matrix file for different emissions pathways
     save(T_name, 'T_Temp', 'T_Precip')
 else
-    load('T_Temp_Precip_RCP85B', 'T_Precip') % updated from Jenny
+    load('T_Temp_Precip_RCP85B', 'T_Precip') % pre-saved transition probability matrix
     T_Temp = deterministicTempMatrix(N);
 end
 
