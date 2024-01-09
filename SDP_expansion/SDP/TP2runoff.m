@@ -11,7 +11,6 @@ function [runoff] = TP2runoff(T_ts, P_ts, steplen)
 % runoff is from CLIRUN in MCM/y , numsamp x steplen*12
 
 % Load CLIRUN calibration results
-%calibrationFile = '29_Jan_2018_17_10_19_calibration.mat';
 calibrationFile = '29Sept2021_CalibratorParams.mat';
 load(calibrationFile, 'X_results')
 

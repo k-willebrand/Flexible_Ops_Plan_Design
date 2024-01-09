@@ -77,7 +77,7 @@ for ss=1:length(storage_vals)
     storage = storage_vals(ss); % reservoir capacity (MCM)
     dead_storage = 20; % MCM
     
-    for s_P = 1:num_P_states % set 18:49 to only consider 66-97 mm/mo
+    parfor s_P = 1:num_P_states % set 18:49 to only consider 66-97 mm/mo
    
         P_state = s_P;
         
