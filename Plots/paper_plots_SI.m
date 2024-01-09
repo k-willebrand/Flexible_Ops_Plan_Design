@@ -71,11 +71,10 @@ end
 
 s_ts = 1:5;
 
-for i=4 % 8 figures
-    
+for i=1:4 % generate plots across 4 figures
+
     fig = figure('units','normalized','outerposition',[0 0 1 1]);
-    s_ps = [1+4*(i-1):4+4*(i-1)];
-    s_ps = [1+8*(i-1):8+8*(i-1)]
+    s_ps = [1+8*(i-1):8+8*(i-1)];
 
     for p=1:length(s_ps)
         for t=1:length(s_ts)
@@ -84,23 +83,22 @@ for i=4 % 8 figures
             subplot(length(s_ps),length(s_ts),(p-1)*length(s_ts)+t);
             bar(1:12,p_table{s_t,s_p});
             hold on
-            plot(0:13,ones(14)*0.05,'r', 'LineWidth',2);
+            plot(0:13,ones(14)*0.05,'r', 'LineWidth', 1);
             ylim([0,1]);
             if mod((p-1)*length(s_ts)+t,length(s_ts)) == 1
                 label_p = ylabel({'P State: '; strcat(string(s_P_(s_p)),' mm/month')},'fontweight','bold','FontSize',12);
                 label_p.Position(1) = -5; % change horizontal position of ylabel
                 set(get(gca,'YLabel'),'Rotation',0)
             end
+            set(gca,'linewidth', 1)
             if p == 1
                 title(strcat('T State: ',string(s_T_abs(s_t)),' C'))
             end
             if p == length(s_ps) && i == 4
                 xlabel('month of year', 'FontSize',12)
             end
-            set(gca,'linewidth',2)
         end
     end
-    %sgtitle({strcat('K-S Test p-values: Log Normal Inflow (', string(i), '/8)');'\alpha = 0.05'})
 
     % prepare figure to save
     origUnits = fig.Units;
@@ -115,31 +113,20 @@ for i=4 % 8 figures
     exportgraphics(gcf, strcat('Figures/SI/figS1_',string(i),'_ksbar.jpg'), 'Resolution', 800)
     exportgraphics(gcf, strcat('Figures/SI/figS1_',string(i),'_ksbar.tif'), 'Resolution', 800)
 
-    % create single .pdf figure
-    if i == 1
-        exportgraphics(gcf, 'Figures/SI/figS1_ksbar.pdf')
-    else
-        exportgraphics(gcf,'Figures/SI/figS1_ksbar.pdf','Append',true)
-    end
-
-    close(fig)
 end
 
 % create single .pdf figure
-fileNames = strcat('Figures/SI/figS1_',string(1:4),'_ksbar.tif');
-f = figure;
-montage(fileNames,"Size",[4 NaN], 'ThumbnailSize', [])
-exportgraphics(gcf, 'Figures/SI/figS1_ksbar.pdf')
-
-fileNames = strcat('figS1_',string(1:4),'_ksbar.tif');
 out = imtile(strcat('figS1_',string(1:4),'_ksbar.tif'),'GridSize', [4, 1]);
 f = figure;
 imshow(out)
+
 % prepare figure to save
 origUnits = fig.Units;
 fig.Units = fig.PaperUnits; 
 fig.PaperSize = fig.Position(3:4);
 fig.Units = origUnits;
+
+% save concatenated figure
 exportgraphics(gcf, 'Figures/SI/figS1_ksbar.pdf', 'Resolution', 1200)
 
 %% Figure S2: Box plot of cost savings for flex design and planning by climate

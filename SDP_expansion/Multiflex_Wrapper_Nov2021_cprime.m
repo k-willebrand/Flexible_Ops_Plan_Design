@@ -70,8 +70,8 @@ for z=1:2 % the adaptive and non-adaptive policies
         x(8) = 50; %optParam.smallPlanCap: unexpanded flexible plan dam size [MCM]
         x(9) = 1; %optParam.numPlan: number of possible expansion capacities [#]
         x(10) = 10; %optParam.planIncr:
-        x(11) = 0; %costParam.PercPlan: initial upfront capital cost increase (0);
-        x(12) = 0.5; %costParam.PercPlanExp: expansion cost of flexibly planned dam (0.5)
+        x(11) = x_11/100; %costParam.PercPlan: initial upfront capital cost increase (0);
+        x(12) = x_12/100; %costParam.PercPlanExp: expansion cost of flexibly planned dam (0.5)
         x(13) = false; %runParam.forwardSim: (1) forward sim (0) no forward sim
         x(14) = z-1; %runParam.adaptiveOps: (1) adaptive operations (0) non-adaptive operations
         x(15) = disc/100; %0.03; %costParam.discountrate
@@ -95,12 +95,10 @@ for z=1:2 % the adaptive and non-adaptive policies
     
     bestAct_static(2)
     if z == 2
-        file_name = strcat('Jun10optimal_dam_design_comb/BestStatic_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        file_name = strcat('Feb7optimal_dam_design_comb/BestStatic_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_s80');
+        file_name = strcat('Results/Results_SDP_expansion/BestStatic_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
         save(file_name, 'bestAct_static','bestVal_static','allV_static','allX_static','allVs_static','allVd_static');
     elseif z == 1
-        file_name = strcat('Jun10optimal_dam_design_comb/BestStatic_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        file_name = strcat('Feb7optimal_dam_design_comb/BestStatic_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_s80');
+        file_name = strcat('Results/Results_SDP_expansion/BestStatic_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
         save(file_name, 'bestAct_static','bestVal_static','allV_static','allX_static','allVs_static','allVd_static');
     end
     
@@ -132,8 +130,8 @@ for z=1:2 % the adaptive and non-adaptive policies
                     x(8) = 50; %optParam.smallPlanCap: unexpanded flexible plan dam size [MCM]
                     x(9) = 1; %optParam.numPlan: number of possible expansion capacities [#]
                     x(10) = 10; %optParam.planIncr:
-                    x(11) = 0; %costParam.PercPlan: initial upfront capital cost increase (0);
-                    x(12) = 0.5; %costParam.PercPlanExp: expansion cost of flexibly planned dam (0.5)
+                    x(11) = x_11/100; %costParam.PercPlan: initial upfront capital cost increase (0);
+                    x(12) = x_12/100; %costParam.PercPlanExp: expansion cost of flexibly planned dam (0.5)
                     x(13) = false; %runParam.forwardSim: (1) forward sim (0) no forward sim
                     x(14) = z-1; %runParam.adaptiveOps: (1) adaptive operations (0) non-adaptive operations
                     x(15) = disc/100; %%costParam.discountrate
@@ -161,10 +159,10 @@ for z=1:2 % the adaptive and non-adaptive policies
     end
     
     if z == 2
-        file_name = strcat('Jun10optimal_dam_design_comb/BestFlex_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
+        file_name = strcat('Results/Results_SDP_expansion/BestFlex_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
         save(file_name, 'bestAct_flex','bestVal_flex','allV_flex','allX_flex','allVs_flex','allVd_flex');
     elseif z == 1
-        file_name = strcat('Jun10optimal_dam_design_comb/BestFlex_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
+        file_name = strcat('Results/Results_SDP_expansion/BestFlex_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
         save(file_name, 'bestAct_flex','bestVal_flex','allV_flex','allX_flex','allVs_flex','allVd_flex');
     end
     
@@ -197,8 +195,8 @@ for z=1:2 % the adaptive and non-adaptive policies
                     x(8) = j; %optParam.smallPlanCap: unexpanded flexible plan dam size [MCM]
                     x(9) = g; %optParam.numPlan: number of possible expansion capacities [#]
                     x(10) = h*10; %optParam.planIncr:
-                    x(11) = 0; %costParam.PercPlan: initial upfront capital cost increase (0);
-                    x(12) = 0.5; %costParam.PercPlanExp: expansion cost of flexibly planned dam (0.5)
+                    x(11) = x_11/100; %costParam.PercPlan: initial upfront capital cost increase (0);
+                    x(12) = x_12/100; %costParam.PercPlanExp: expansion cost of flexibly planned dam (0.5)
                     x(13) = false; %runParam.forwardSim: (1) forward sim (0) no forward sim
                     x(14) = z-1; %runParam.adaptiveOps: (1) adaptive operations (0) non-adaptive operations
                     x(15) = disc/100; %costParam.discountrate
@@ -226,10 +224,10 @@ for z=1:2 % the adaptive and non-adaptive policies
     end
 
     if z == 2
-        file_name = strcat('Jun10optimal_dam_design_comb/BestPlan_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
+        file_name = strcat('Results/Results_SDP_expansion/BestPlan_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
         save(file_name, 'bestAct_plan','bestVal_plan','allV_plan','allX_plan','allVs_plan','allVd_plan');
     elseif z == 1
-        file_name = strcat('Jun10optimal_dam_design_comb/BestPlan_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
+        file_name = strcat('Results/Results_SDP_expansion/BestPlan_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
         save(file_name, 'bestAct_plan','bestVal_plan','allV_plan','allX_plan','allVs_plan','allVd_plan');
     end
         
@@ -246,8 +244,8 @@ for z=1:2 % the adaptive and non-adaptive policies
     x(8) = bestAct_plan(8); %optParam.smallPlanCap: unexpanded flexible plan dam size [MCM]
     x(9) = bestAct_plan(9); %optParam.numPlan: number of possible expansion capacities [#]
     x(10) = bestAct_plan(10); %optParam.planIncr:
-    x(11) = 0; %costParam.PercPlan: initial upfront capital cost increase (0);
-    x(12) = 0.5; %costParam.PercPlanExp: expansion cost of flexibly planned dam (0.5)
+    x(11) = x_11/100; %costParam.PercPlan: initial upfront capital cost increase (0);
+    x(12) = x_12/100; %costParam.PercPlanExp: expansion cost of flexibly planned dam (0.5)
     x(13) = true; %runParam.forwardSim: (1) forward sim (0) no forward sim
     x(14) = z-1; %runParam.adaptiveOps: (1) adaptive operations (0) non-adaptive operations
     x(15) = disc/100; %costParam.discountrate
@@ -256,10 +254,10 @@ for z=1:2 % the adaptive and non-adaptive policies
     
     run('multiflex_sdp_climate_StaticFlex_DetT_Nov2021_cprime');
     if z == 2
-        file_name = strcat('Jun10optimal_dam_design_comb/BestFlexStaticPlan_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
+        file_name = strcat('Results/Results_SDP_expansion/BestFlexStaticPlan_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
         save(file_name, 'bestAct', 'V', 'X','action', 'totalCostTime','damCostTime','C_state','P_state','Vs','Vd')
     elseif z == 1
-        file_name = strcat('Jun10optimal_dam_design_comb/BestFlexStaticPlan_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
+        file_name = strcat('Results/Results_SDP_expansion/BestFlexStaticPlan_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
         save(file_name, 'bestAct', 'V', 'X', 'action', 'totalCostTime','damCostTime','C_state','P_state','Vs','Vd')
     end
     

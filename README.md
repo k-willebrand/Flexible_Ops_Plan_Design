@@ -21,9 +21,9 @@ This repository is comprised of three primary modeling components and a plotting
 
 ### 1. **Dynamic climate uncertainty model**
    1. Calculates and saves the precipitation state transition probability matrix that is referenced in the infrastructure planning SDP
-   2. Generates monthly precipitation and temperature time series for each climate staet using a K-nn approach 
-   3. Derives monthly inflow time series of inflow into the reservoir using the a lumped conceptual rainfall-runoff model
-   2. **Key folders:** `BMA_code`, `CLIRUN`,`Streamflow_yield_analysis`  
+   2. Generates monthly precipitation and temperature time series for each climate state using a K-nn approach (Rajagopalan & Lall, 1999; Skerker et al., 2023)
+   3. Derives monthly inflow time series of inflow into the reservoir using a lumped conceptual rainfall-runoff model (Strzepek & Mccluskey, 2010)
+   2. **Key folders:** `BMA_code`, `CLIRUN`,`Streamflow_yield_analysis`, `SDP_expansion`  
    
    
 ### 2. **Reservoir operation SDP**
@@ -45,25 +45,40 @@ This repository is comprised of three primary modeling components and a plotting
    1. Plotting utilties for recreating the figures published in Willebrand et al. (2024)
    2. **Key folder:** `Plots`
 
-This model uses the Mwache Dam in Kenya as a case study example.
+This model uses the Mwache Dam in Kenya as a case study.
 
 
 ## Key Model and Data Descriptions
 
-### **Dynamic climate uncertainty model** 
+### **Dynamic climate uncertainty model**
+
+1. `multiflex_sdp_climate_StaticFlex_DetT_Nov2021.m`: This is the primary script that defines the infrastructure planning
+   SDP. This script includes steps that calculate the climate change transition matrix using Bayesian Model Averaging (BMA)
+   (see Fletcher et al., 2019) and temperature, precipitation, and runoff monthly time series for each climate state 
+   (Rajagopalan & Lall, 1999; Skerker et al., 2023; Strzepek & Mccluskey, 2010).
+
+2. `BMA_results_RCP85_2020-11-14.mat`: Matlab data file containing the BMA results that are used to develop the transition probability matrix for precipitation (see Fletcher et al., 2019).
 
 
-2. `T_Temp_Precip_RCP85B.mat`: Matlab data file containing the calculated precipiation state transition probability matrix. This file is referenced in the infrastructure planning SDP.
+3. `Mombasa_TandP.mat`: Matlab data file containing monthly time series of temperature and precipitation from 21 modeled General Circulation Models (GCMs) for 1900-2100.
 
 
-3. `runoff_by_state_02Nov2021.mat`: Matlab data file containing the resulting 200-year-long monthly time series of temperature, precipitation, and runoff across 21 modeled General Circulation Models (GCMs).
+4. `T_Temp_Precip_RCP85B.mat`: Matlab data file containing the calculated precipitation state transition probability matrix. Temperature transition probabilities are assumed to be deterministic. This file is referenced in the infrastructure planning SDP.
+
+
+5. `runoff_by_state_02Nov2021.mat`: Matlab data file containing the resulting synthetic 200-year-long monthly time series of temperature, precipitation, and runoff across 21 modeled GCMs.
+
+
+6. `29Sept2021_CalibratorParams.mat`: Calibration parameters for running the CLIRUN model (see Skerker et al., 2023).
+
 
 ### Infastructure planning SDP
 
 1. `multiflex_sdp_climate_StaticFlex_DetT_Nov2021.m`:
    
    This is the primary script that defines the infrastructure planning SDP. 
-   The parameter setup for the file explicitly defines some parameters and inputs others from Multiflex_OptimizeSimulate.m. The run parameters at the top of the script are used to specify which parts of the script to run different components of the model. 
+   The parameter setup for the file defines parameter and inputs defined in `Multiflex_Wrapper_Nov2021_cprime.m`. 
+   The run parameters specify which whether to run different components of the model. 
 
 
 2. `Multiflex_Wrapper_Nov2021_cprime.m`:
@@ -78,26 +93,27 @@ This model uses the Mwache Dam in Kenya as a case study example.
       4. Run and save the forward simulation results for each of the with the six flexible/static infrastructure alternatives
 
 
-
 ### Reservoir operation SDP
 
 1. `cluster_parfor_main_script_SDP_Evap_SteadyState.m`
 
    This is the main script utilized to optimize and simulate adaptive (flexible) and non-adaptive (static) reservoir 
-   operations using SDP. This script is parallized. Multiple jobs can be submitted to high performance computing clusters 
+   operations using SDP based on Giuliani et al. (2016). This script is parallized. Multiple jobs can be submitted to high performance computing clusters 
    (e.g., across different dam capacities to effeciently optimize and simulate operating policies across 
-   different discrete climate states). 
+   different discrete climate states). Postprocessing is then performed on intermediate simulated reservoir operating 
+   files to save results in a file format compatible with the infrastructure planning SDP code.
 
-
-   Then, postprocessing is performed to save results in a format compatible with the infrastructure planning SDP code.
-
-   
 
 2. `cluster_main_script_SDP_postProcessing.m`
 
    A postprocessing script that reformats and saves the expected reservoir operations shortage costs from
-   `cluster_parfor_main_script_SDP_Evap_SteadyState.m` into an appropriate matrix structure for use with the 
+   `cluster_parfor_main_script_SDP_Evap_SteadyState.m` into an file naming convention and structure for use with the 
    infrastructure planning SDP.
+
+
+3. `Results/Results_SDP_reservoir_ops`: folder containing previously calculated expected shortage costs for 
+   each candidate dam capacity under adaptive (flexible) and non-adaptive (static) operations. These files are used when
+   running the infrastructure planning SDP with previously calcuated results from the reservoir operation SDP (recommended).
 
 ## Steps to Run the Model
 
@@ -107,15 +123,72 @@ provided at the start of key scripts (e.g., `multiflex_sdp_climate_StaticFlex_De
 To run this model to recreate the results from Willebrand et al. (2024):
 
 1. Download the Github repository
+
+
 2. Add the folder to your local path. This can be acheived in Matlab by running the following line:
 ```
 addpath(genpath('local directory/Flexible_Ops_Plan_Design'))
 ```
-3. Update the default file path names to correspond with your updated local path
-4. Obtain the climate change transition probability matrix for the infrastructure planning SDP by either:
-   1. 
-5. Obtain the expected shortage cost results for each candidate dam capacity and infrastructure operating alternative (recommended use of parallelization)
-   1. use the previously saved shortage cost results obtained from the simulatation of optimized adaptive (flexible) and non-adaptive (static) reservoir operation policies.
-   2. Run 
+
+
+3. Update the default file path names to correspond with your local path
+
+
+4. Select method for obtaining the climate state transition probability matrix for the infrastructure planning SDP by either:
+
+   1. Running the script `multiflex_sdp_climate_StaticFlex_DetT_Nov2021.m` where the parameters `runRunoff`, `runTPts`, 
+   and `runoffPostProcess` should be set to `true` (default: False). This will recalculate and save 
+   use with the infrastructure planning SDP.
+
+   2. Using the previously calculated probability matrix Matlab data file where the parameters `runRunoff`, `runTPts`, 
+   and `runoffPostProcess` should be set to `false` in `multiflex_sdp_climate_StaticFlex_DetT_Nov2021.m`(recommended to reduce computational time). 
+
+
+5. Obtain the expected shortage cost results for each candidate dam capacity and infrastructure operating alternative by either:
+
+   1. Re-running the reservoir operations SDP via `cluster_parfor_main_script_SDP_Evap_SteadyState.m`. 
+      1. This script is parallized. Multiple jobs can be submitted to high performance computing clusters 
+   (e.g., across different dam capacities to effeciently optimize and simulate operating policies across 
+   different discrete climate states). 
+      2. Postprocess the resulting saved files using `cluster_main_script_SDP_postProcessing.m` for use with the infrastructure planning SDP.
+   2. Using the previously saved shortage cost results obtained from running the reservoir operation SDP. 
+      1. The infrastructure planning SDP is configured to use preloaded shortage costs data output from the 
+         reservoir operations SDP to reduce the computational time required to repeatedly rerun the reservoir operations SDP. 
+      2. The use of preloaded data is specified by `runParam.calcShortage = false` in `multiflex_sdp_climate_StaticFlex_DetT_Nov2021.m`. 
+      3. Preloaded data is contained in the folder `Results/Results_SDP_reservoir_ops`.
+
+
 6. Run the infrastructure planning SDP
-   1. Select
+
+   1. Update the cost model parameters (c' water shortage cost parameter and discount rate) in `Multiflex_Wrapper_Nov2021_cprime.m`. 
+      2. Cost parameters can be specified as arrays to test different cost scenarios. 
+      3. This is helpful when conducting senstivity analysis for c' and discount rate. For example, c' sensitivity analysis results 
+      from Willebrand et al. (2024) are saved in 'Results/Results_cprime_sensitivity'
+   2. To consider alternative dam capacity assumptions (e.g., specify initial dam capacity as 60 MCM), update conditional constraints on dam sizes in `Multiflex_Wrapper_Nov2021_cprime.m`. 
+   3. Run `Multiflex_Wrapper_Nov2021_cprime.m`. Results by default will be saved in `Results/Results_SDP_expansion`.
+
+7. Analyze the results
+
+   1. Final results are saved in the `Results` folder for analysis
+   2. Consider using the included plotting utilities in the `Plots` folder
+
+
+## References
+Fletcher, S., Lickley, M., & Strzepek, K. (2019). Learning about climate change uncertainty enables flexible water infrastructure planning. *Nature Communications*, 10(1), Article 1. https://doi.org/10.1038/s41467-019-09677-x
+
+
+Giuliani, M., Y. Li, A. Cominola, S. Denaro, E. Mason, and A. Castelletti (2016), A Matlab toolbox for designing Multi-Objective Optimal Operations of water reservoir systems, *Environmental Modelling & Software*, 85, 293–298
+
+
+Rajagopalan, B., & Lall, U. (1999). A k-nearest-neighbor simulator for daily precipitation and other weather variables. *Water Resources Research*, 35(10), 3089–3101. https://doi.org/10.1029/1999WR900028
+
+
+Skerker, J. B., Zaniolo, M., Willebrand, K., Lickley, M., & Fletcher, S. M. (2023). Quantifying the Value of Learning for Flexible Water Infrastructure Planning. *Water Resources Research*, 59(6), e2022WR034412. https://doi.org/10.1029/2022WR034412
+
+
+Strzepek, K. M., & Mccluskey, A. L. (2010). Modeling the Impact of Climate Change on Global Hydrology and Water Availability. World Bank Group. https://assets.publishing.service.gov.uk/media/57a08b18ed915d3cfd000b20/EACC-Hydrology.pdf
+
+
+Willebrand, K., Zaniolo, M., Skerker, J.B., and Fletcher, S.M., Assessing the interacting value of flexible planning, design, and operations in water supply infrastructure, *Water Resources Research*, 2024. [In Review]
+
+

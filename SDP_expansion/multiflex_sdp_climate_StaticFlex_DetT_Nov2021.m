@@ -10,8 +10,8 @@
 % The updated SDP action space allows for dam expansion to optParam.numFlex number
 % of possible flexible expansion capacities with expanded capacities increasing
 % at an increment of optParam.flexIncr MCM  starting from the smallest
-% capacity, optParam.smallCap. This script allows for a reactive and
-% proactive dam expansion process to be considered.
+% capacity, optParam.smallCap. This script allows for a reactive (flexible planning) and
+% proactive (flexible design) dam expansion process to be considered.
 
 % The capacity state space in the SDP now allows for: an optimal static option,
 % an optimal planned dam option, an optimal initial flexible dam option with
@@ -23,7 +23,7 @@
 % be selected initially so that the value function in the SDP corresponds to the
 % static dam.
 
-% if optParam.optFlex = 1, then the SDP forces the flexible dam option to
+% if optParam.optFlex = 1, then the SDP forces the flexible dam (flexible planning or design) option to
 % be selected initially so that the value function in the SDP corresponds to the
 % flexible dams.
 
@@ -39,8 +39,7 @@
 % If using pre-saved shortage costs, shortage cost files for flexible dam
 % will be created within the "calculate shortage cost section." Use
 % runParam.calcShortage = false to use preloaded data contained in the
-% folders 'post_process_nonopt_reservoir_results' and
-% 'post_process_opt_reservoir_results.'
+% folders 'Results/Results_SDP_reservoir_ops'
 
 %% OPTIMAL DAM DESIGN SETUP 
 
@@ -52,10 +51,9 @@ costParam = struct;
 % dam design. If (1), optimize design for a flexible dam. If (2),
 % optimize the design for a static dam. If (3), optimize design for flexibly 
 % planned dam. If (0), do not force dam design decision in time period N = 1.
-optParam.optFlex = x(1); %0;
+optParam.optFlex = x(1); % 0;
 
 % ======================== OPTIMAL DAM DESIGNS ============================
-% capacity values range 50:5:150 in the dam costmodel
 
 % STATIC DAM
 optParam.staticCap = x(2); % static dam size [MCM]
@@ -123,7 +121,7 @@ runParam = struct;
 % Number of time periods
 runParam.N = 5; % Current SDP model requires N = 5 
 
-% If true, run SDP to calculate optimal policies
+% If true, run infrastructure planning SDP to calculate optimal policies
 runParam.runSDP = true; %x(9)
 
 % Number of years to generate in T, P, streamflow time series
@@ -250,8 +248,8 @@ s_C = 1:3+optParam.numFlex+optParam.numPlan;
 M_C = length(s_C);
 
 storage = zeros(1, M_C); 
-storage(1) = optParam.staticCap; % added line
-storage(2) = optParam.smallFlexCap; % edited line from (1) to (2)
+storage(1) = optParam.staticCap; 
+storage(2) = optParam.smallFlexCap; 
 storage(3) = optParam.smallPlanCap; 
 % expansion from small capacity (2) to (3). Maximum dam capacity considered
 % is 150 MCM by the World Bank for the Mwache Dam project.
