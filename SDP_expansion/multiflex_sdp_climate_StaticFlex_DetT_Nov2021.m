@@ -4,8 +4,7 @@
 % This script parallels the structure of the script sdp_climate.m. The
 % current version of this script supports preloaded shortage costs to be 
 % loaded within the script so that the dimensions of the shortage costs data is
-% represents multiple flexible dam sizes(i.e., possible to set
-% runParam.calcShortage = false).
+% represents multiple flexible dam sizes(i.e., set runParam.calcShortage = false).
 
 % The updated SDP action space allows for dam expansion to optParam.numFlex number
 % of possible flexible expansion capacities with expanded capacities increasing
@@ -64,8 +63,8 @@ optParam.numFlex = x(4);  % number of possible expansion capacities [#]
 optParam.flexIncr = x(5); % increment of flexible expansion capacities [MCM]
 
 % flexible design dam cost parameters
-costParam.PercFlex = x(6); % Initial upfront capital cost increase (0.075)
-costParam.PercFlexExp = x(7); % Expansion cost of flexible dam  (0.15)
+costParam.PercFlex = x(6); % Initial upfront capital cost increase
+costParam.PercFlexExp = x(7); % Expansion cost of flexible dam 
 
 % FLEXIBLE PLANNING DAM
 optParam.smallPlanCap = x(8); % unexpanded flexible planning dam size [MCM]
@@ -112,7 +111,7 @@ datetime=strrep(datetime,' ','_');%Replace space with underscore
 
 % Set up run parameters
 % Two purposes: 1) different pieces can be run independently using
-% saved results and 2) different planning scenarios (table 1) can be run
+% saved results and 2) different planning scenarios can be run
 
 % ========================= GENERAL SCRIPT SETUP ==========================
 
@@ -124,7 +123,7 @@ runParam.N = 5; % Current SDP model requires N = 5
 % If true, run infrastructure planning SDP to calculate optimal policies
 runParam.runSDP = true; %x(9)
 
-% Number of years to generate in T, P, streamflow time series
+% Number of years in each decision period
 runParam.steplen = 20; 
 
 % Set Emissions Scenario
@@ -157,14 +156,6 @@ runParam.calcShortage = false;
 % Urban water demand scenarios (low = 150,000; high = 300,000)[m3/d](Fletcher 2019)
 runParam.domDemand = 186000; 
 
-% If false, do not include deslination plant (planning scenarios A and B
-% with current demand in table 1). If true, include desalination plant
-% (planning scenario C with higher deamnd).
-runParam.desalOn = false; 
-
-% Size of desalination plant for small and large versions [MCM/y]
-runParam.desalCapacity = [60 80];
-
 % If using pre-saved runoff time series, name of .mat file to load
 runParam.runoffLoadName = 'runoff_by_state_02Nov2021';
 
@@ -179,25 +170,27 @@ climParam = struct;
 climParam.numSamp_delta2abs = 100000;
 
 % Number of T,P time series to generate using stochastic weather generator
-climParam.numSampTS = 100;
+climParam.numSampTS = 21;
+
+% Number of years to generate in T, P, streamflow time series
+climParam.steplen = 100;
 
 % If true, test number of simulated climate values are outside the range of
 % the state space in order to ensure state space validity
-climParam.checkBins = false;
+climParam.checkBins = true;
 
 % Value of shortage penalty for domestic use [$/m3]
-costParam.domShortage = 0.65; % Fletcher et al. (2019) utilized 5
+costParam.domShortage = 0.65; 
 
 % Value of shortage penalty for ag use [$/m3]
-costParam.agShortage = 0.28; % Fletcher et al. (2019) utilized 0
+costParam.agShortage = 0.28; 
 
 % Use the parameter c' to scale the quadratic shortage cost formulation to
 % reflect the average water unit cost reported by the FAO for Africa.
-% for 3% discounting: c' = 6e-6
-costParam.cPrime = 6e-6; %7.65e-5;%Recent:4.85e-7; %V1: 1.6e-7; %1.85e-9; % [$/m^6];
+costParam.cPrime = c_prime; % water shortage cost parameter [$/m^6];
 
 % Discount rate
-costParam.discountrate = x(15); %0.03;
+costParam.discountrate = x(15); %e.g., 0.03;
 
 %% SDP State and Action Definitions 
 
@@ -263,46 +256,29 @@ a_exp = 0:3+optParam.numFlex+optParam.numPlan;
 % 0 - do nothing; 1 - build static;  2 - build flex; 3 - build flex plan;
 % 4:3+optParam.numFlex - expand flex to option X; 4+optParam.numFlex:end - expand flex plan to option X; 
  
-% Define infrastructure costs            
+% Define infrastructure costs for dam           
 infra_cost = zeros(1,length(a_exp));
-if ~runParam.desalOn
-    
-    % Planning scenarios A and B with current demand: only model dam
-    
-    % dam costs
-    infra_cost(2) = storage2damcost(storage(1),0); % cost of static dam
-    for i = 1:optParam.numFlex % cost of flexible design dam
-        [infra_cost(3), infra_cost(i+4)] = storage2damcost(storage(2), ...
-            storage(i+3),costParam.PercFlex, costParam.PercFlexExp); % cost of flexible design exp to option X
-    end
-    for i = 1:optParam.numPlan % cost of flexible plan dam
-        [infra_cost(4), infra_cost(i+4+optParam.numFlex)] = storage2damcost(storage(3), ...
-            storage(i+3+optParam.numFlex),costParam.PercPlan, costParam.PercPlanExp); % cost of flexible planning exp to option X
-    end
-        
-    %for each expanded threshold, calculate (from small expansion to larger
-    %expansion):
-    flexexp = zeros(1,M_C-3);
-    for i=1:optParam.numFlex % flexible design dam
-        flexexp(i) = infra_cost(3) + infra_cost(4+i); %flexexp(i) = infra_cost(4) + infra_cost(4+i); % total expanded cost for each option
-    end
-    for i=1:optParam.numPlan % flexible plan dam
-        flexexp(optParam.numFlex+i) = infra_cost(4) + infra_cost(4+optParam.numFlex+i); %flexexp(i) = infra_cost(4) + infra_cost(4+i); % total expanded cost for each option
-    end
-else
-    
-    % Planning scenario C: dam exists, make decision about new desalination plant
-    % 6/16: Not updated
-    % desal capital costs
-    [infra_cost(2),~,opex_cost] = capacity2desalcost(runParam.desalCapacity(1),0); % small
-    infra_cost(3) = capacity2desalcost(runParam.desalCapacity(2),0); % large
-    [infra_cost(4), infra_cost(5)] = capacity2desalcost(runParam.desalCapacity(1), runParam.desalCapacity(2));  
-    
-    % desal capital costs two individual plants
-    infra_cost(4) = infra_cost(2);
-    infra_cost(5) = capacity2desalcost(runParam.desalCapacity(2) - runParam.desalCapacity(1),0);
+     
+% dam costs
+infra_cost(2) = storage2damcost(storage(1),0); % cost of static dam
+for i = 1:optParam.numFlex % cost of flexible design dam
+    [infra_cost(3), infra_cost(i+4)] = storage2damcost(storage(2), ...
+        storage(i+3),costParam.PercFlex, costParam.PercFlexExp); % cost of flexible design exp to option X
 end
-
+for i = 1:optParam.numPlan % cost of flexible plan dam
+    [infra_cost(4), infra_cost(i+4+optParam.numFlex)] = storage2damcost(storage(3), ...
+        storage(i+3+optParam.numFlex),costParam.PercPlan, costParam.PercPlanExp); % cost of flexible planning exp to option X
+end
+    
+%for each expanded threshold, calculate (from small expansion to larger
+%expansion):
+flexexp = zeros(1,M_C-3);
+for i=1:optParam.numFlex % flexible design dam
+    flexexp(i) = infra_cost(3) + infra_cost(4+i); %flexexp(i) = infra_cost(4) + infra_cost(4+i); % total expanded cost for each option
+end
+for i=1:optParam.numPlan % flexible plan dam
+    flexexp(optParam.numFlex+i) = infra_cost(4) + infra_cost(4+optParam.numFlex+i); %flexexp(i) = infra_cost(4) + infra_cost(4+i); % total expanded cost for each option
+end
 
   
 %% Calculate climate transition matrix 
@@ -312,7 +288,8 @@ end
 
 if runParam.calcTmat
     load('BMA_results_RCP85_2020-11-14.mat')
-    [T_Temp, T_Precip, ~, ~, ~, ~] = bma2TransMat( NUT, NUP, s_T, s_P, N, climParam);
+    [T_Precip, ~, ~] = bma2TransMat_P( NUP, s_P, N, climParam);
+    T_Temp = deterministicTempMatrix(N);
     T_name = strcat('T_Temp_Precip_', runParam.setPathway) % save a different transition matrix file for different emissions pathways
     save(T_name, 'T_Temp', 'T_Precip')
 else
@@ -340,7 +317,7 @@ if runParam.runTPts
     T_ts = cell(M_T_abs,N);
     P_ts = cell(M_P_abs,N);
 
-    [Tanom, Panom] = mean2TPtimeseriesMJL_2(1, runParam.steplen, climParam.numSampTS); 
+    [Tanom, Panom] = mean2TPtimeseriesMJL_2(1, climParam.steplen, climParam.numSampTS); 
     for t = 1:N
 
         for i = 1:M_T_abs  
@@ -371,9 +348,9 @@ if runParam.runRunoff
 
 
     % Set up parallel for running on cluster with SLURM queueing system
-    pc = parcluster('local');
     if ~isempty(getenv('SLURM_JOB_ID'))
-        parpool(pc, str2num(getenv('SLURM_CPUS_ON_NODE')));
+        poolobj = parpool('local', str2num(getenv('SLURM_CPUS_PER_TASK')));
+        fprintf('Number of workers: %g\n', poolobj.NumWorkers)
     end
 
     for t = 1
@@ -438,93 +415,11 @@ load(runParam.runoffLoadName);
 
 end
 
-%% Use reservoir operation model to calculate yield and shortage costs
+%% Use reservoir operation model load shortage costs
 
-if runParam.calcShortage
-
-    unmet_ag = nan(M_T_abs, M_P_abs, length(storage), N);   % Unmet demand for agriculture use
-    unmet_dom = nan(M_T_abs, M_P_abs, length(storage), N);  % Unmet demand for domestic use
-    unmet_ag_squared = nan(M_T_abs, M_P_abs, length(storage), N); % Squared unmet agriculuture demands
-    unmet_dom_squared = nan(M_T_abs, M_P_abs, length(storage), N); % Squared unmet domestic demands
-    yield = nan(M_T_abs, M_P_abs, length(storage), N);  % Yield from reservoir
-    desal = cell(M_T_abs, M_P_abs, length(storage));    % Production of desalinated water
-
-    for t = 1 % Consider N = 1 assuming that the hydrological model and reservoir operations do not vary significantly between planning periods (N)
-        
-        index_s_p_thisPeriod = index_s_p_time{t}; 
-        
-        for index_s_p = 1:length(s_P_abs)
-
-            index_s_t_thisPeriod = index_s_t_time{t}; 
-            for index_s_t= 1:length(s_T_abs)
-
-                for s = 1:length(storage) % for each capacity scenario, find shortage costs from operations
-                    % Two options depending on planning scenario from Table
-                    % 1: In scenarios A and B, with low demand, only the
-                    % dam is modeled, and different levels of capacity in
-                    % the state space corresponds to different reservoir
-                    % volumes (desalOn = false). In scenario C, a
-                    % desalination plant is modeled to support higher
-                    % demand > MAR. In this case (desalOn = true), the
-                    % state space corresponds to different desalination
-                    % capacity volumes, assuming the large volume of
-                    % reservoir storage.
-                    
-                    if ~runParam.desalOn
-                        % vary storage, no desal
-                        [yield_mdl, K, dmd, unmet_dom_mdl, unmet_ag_mdl, desalsupply, desalfill]  = ...
-                            runoff2yield(runoff{index_s_t,index_s_p,t}, T_ts{index_s_t,t}, P_ts{index_s_p,t}, storage(s), 0, runParam, climParam, costParam);
-                    else
-                        % large storage, vary desal
-                        [yield_mdl, K, dmd, unmet_dom_mdl, unmet_ag_mdl, desalsupply, desalfill]  = ...
-                            runoff2yield(runoff{index_s_t,index_s_p,t}, T_ts{index_s_t,t}, P_ts{index_s_p,t}, storage(2), runParam.desalCapacity(s), runParam, climParam, costParam);
-                    end
-                    
-                    % OMITTED: 'Calculate ummet demand, allowing for 10% of domestic demand
-                    % to be unpenalized per 90% reliability goal(unmet_dom_90)'
-
-                    unmet_ag(index_s_t, index_s_p, s, t) = mean(sum(unmet_ag_mdl,2));
-                    unmet_dom(index_s_t, index_s_p, s, t) = mean(sum(unmet_dom_mdl,2));
-                    unmet_ag_squared(index_s_t, index_s_p, s, t) = mean(sum(unmet_ag_mdl.^2,2)); 
-                    unmet_dom_squared(index_s_t, index_s_p, s, t) = mean(sum(unmet_dom_mdl.^2,2)); 
-                    yield(index_s_t, index_s_p, s, t) = mean(sum(yield_mdl,2));
-                    if runParam.desalOn
-                        desal{index_s_t, index_s_p, s} = desalsupply + desalfill;
-                    end
-                    
-                end
-                
-                stateMsg = strcat('s_p =', num2str(index_s_p), '/ ', num2str(length(s_P_abs)), ', s_t=', num2str(index_s_t), '/  ',  num2str(length(s_T_abs)));
-                disp(stateMsg)
-
-            end
-        end
-    end
-    
-    % Calculate shortage costs incurred for unmet demand, using
-    % differentiated costs for agriculture and domestic shortages and
-    % quadratic formulation
-    shortageCost =  (unmet_ag_squared * costParam.agShortage + unmet_dom_squared * costParam.domShortage) * 1E6; 
-    
-    % In planning scenario C with the desalination place, also calculate
-    % discounted cost of oeprating the desalination plant
-    if runParam.desalOn
-
-        desal_opex = nan(M_T_abs, M_P_abs, length(storage), N);
-        for t = 1:N
-            discountfactor =  repmat((1+costParam.discountrate) .^ ((t-1)*runParam.steplen+1:1/12:t*runParam.steplen+11/12), 100, 1);
-            desal_opex(:,:,:,t) = cell2mat(cellfun(@(x) mean(sum(opex_cost * x ./ discountfactor, 2)), desal, 'UniformOutput', false));
-        end
-        else
-            desal_opex = [];
-    end
-    
-    if runParam.saveOn
-        savename_shortageCost = strcat('shortage_costs', jobid,'_', datetime);
-        save(savename_shortageCost, 'shortageCost', 'yield', 'unmet_ag', 'unmet_dom', 'unmet_ag_squared', 'unmet_dom_squared','desal_opex')
-    end
-else % use the pre-calculated shortage cost files to fast-track calculations
-    
+if runParam.calcShortage % not supported: first run reservoir operations SDP
+    error('Error. \runParam.calcShortage must be False.')
+else % Use the pre-calculated shortage cost files to fast-track calculations
     % Preallocate final shortage cost matrix
     shortageCost = NaN(M_T_abs, M_P_abs, length(storage), N);
     if runParam.optReservoir % shortage costs from adaptive reservoir operations via SDP
@@ -664,11 +559,7 @@ for t = linspace(N,1,N)
                     ind_dam = find(a == a_exp);
                     dCost = infra_cost(ind_dam);
                     cost = (sCost + dCost) / (1+costParam.discountrate)^((t-1)*runParam.steplen+1);
-                    if runParam.desalOn
-                        opex = desal_opex(index_s_t, index_s_p, short_ind, t);
-                    else
-                        opex = 0;
-                    end
+                    opex = 0;
                     cost = cost + opex;
                     
                      % keep track of discounted dam costs and shortage costs
@@ -900,9 +791,6 @@ for i = 1:R
             end
             ind_dam = find(a == a_exp);
             damCostTime(i,t,k) = infra_cost(ind_dam)  / (1+costParam.discountrate)^((t-1)*runParam.steplen+1);
-            if runParam.desalOn
-                opexCostTime(i,t,k) = desal_opex(index_t, index_p, short_ind, t);
-            end
             totalCostTime(i,t,k) = (shortageCostTime(i,t,k) + damCostTime(i,t,k));
             totalCostTime(i,t,k) = totalCostTime(i,t,k) + opexCostTime(i,t,k);
             
@@ -951,8 +839,6 @@ for i = 1:R
                 C_state(i,t+1,k) = s_C(ind_s3);
 
             end
-
-
 
         end
 

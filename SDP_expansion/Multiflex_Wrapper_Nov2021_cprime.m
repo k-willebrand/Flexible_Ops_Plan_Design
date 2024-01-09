@@ -76,7 +76,7 @@ for z=1:2 % the adaptive and non-adaptive policies
         x(14) = z-1; %runParam.adaptiveOps: (1) adaptive operations (0) non-adaptive operations
         x(15) = disc/100; %0.03; %costParam.discountrate
         
-        run('multiflex_sdp_climate_StaticFlex_DetT_Nov2021_cprime');
+        run('multiflex_sdp_climate_StaticFlex_DetT_Nov2021');
         val = V(1, 12, 1, 1)/1E6
         val_static(count,z) = V(1, 12, 1, 1)/1E6;
         Vs_static(count,z) = Vs(1, 12, 1, 1)/1E6;
@@ -96,10 +96,10 @@ for z=1:2 % the adaptive and non-adaptive policies
     bestAct_static(2)
     if z == 2
         file_name = strcat('Results/Results_SDP_expansion/BestStatic_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        save(file_name, 'bestAct_static','bestVal_static','allV_static','allX_static','allVs_static','allVd_static');
+        %save(file_name, 'bestAct_static','bestVal_static','allV_static','allX_static','allVs_static','allVd_static');
     elseif z == 1
         file_name = strcat('Results/Results_SDP_expansion/BestStatic_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        save(file_name, 'bestAct_static','bestVal_static','allV_static','allX_static','allVs_static','allVd_static');
+        %save(file_name, 'bestAct_static','bestVal_static','allV_static','allX_static','allVs_static','allVd_static');
     end
     
     
@@ -107,7 +107,7 @@ for z=1:2 % the adaptive and non-adaptive policies
     bestVal_flex = inf;
     count = 1;
     
-    for j=30:10:150
+    for j=30:10:140
         for h=1 % flex expansion increments
             for g=1:7 % number of flex expansion(7-2*h)
                 
@@ -136,7 +136,7 @@ for z=1:2 % the adaptive and non-adaptive policies
                     x(14) = z-1; %runParam.adaptiveOps: (1) adaptive operations (0) non-adaptive operations
                     x(15) = disc/100; %%costParam.discountrate
                     
-                    run('multiflex_sdp_climate_StaticFlex_DetT_Nov2021_cprime');
+                    run('multiflex_sdp_climate_StaticFlex_DetT_Nov2021');
                     val = V(1, 12, 1, 1)/1E6 % 1st temperature state, 77 mm/mo
                     val_flex(count,z) = V(1, 12, 1, 1)/1E6;
                     Vs_flex(count,z) = Vs(1, 12, 1, 1)/1E6;
@@ -160,10 +160,10 @@ for z=1:2 % the adaptive and non-adaptive policies
     
     if z == 2
         file_name = strcat('Results/Results_SDP_expansion/BestFlex_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        save(file_name, 'bestAct_flex','bestVal_flex','allV_flex','allX_flex','allVs_flex','allVd_flex');
+        %save(file_name, 'bestAct_flex','bestVal_flex','allV_flex','allX_flex','allVs_flex','allVd_flex');
     elseif z == 1
         file_name = strcat('Results/Results_SDP_expansion/BestFlex_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        save(file_name, 'bestAct_flex','bestVal_flex','allV_flex','allX_flex','allVs_flex','allVd_flex');
+        %save(file_name, 'bestAct_flex','bestVal_flex','allV_flex','allX_flex','allVs_flex','allVd_flex');
     end
     
     
@@ -171,7 +171,7 @@ for z=1:2 % the adaptive and non-adaptive policies
     bestVal_plan = inf;
     count = 1;
     
-    for j=30:10:150
+    for j=30:10:140
 
         for h=1 % flex expansion increments
             for g=1:7 % number of flex expansion(7-2*h)
@@ -201,7 +201,7 @@ for z=1:2 % the adaptive and non-adaptive policies
                     x(14) = z-1; %runParam.adaptiveOps: (1) adaptive operations (0) non-adaptive operations
                     x(15) = disc/100; %costParam.discountrate
                     
-                    run('multiflex_sdp_climate_StaticFlex_DetT_Nov2021_cprime');
+                    run('multiflex_sdp_climate_StaticFlex_DetT_Nov2021');
                     val = V(1, 12, 1, 1)/1E6
                     val_plan(count,z) = V(1, 12, 1, 1)/1E6;
                     Vs_plan(count,z) = Vs(1, 12, 1, 1)/1E6;
@@ -225,10 +225,10 @@ for z=1:2 % the adaptive and non-adaptive policies
 
     if z == 2
         file_name = strcat('Results/Results_SDP_expansion/BestPlan_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        save(file_name, 'bestAct_plan','bestVal_plan','allV_plan','allX_plan','allVs_plan','allVd_plan');
+        %save(file_name, 'bestAct_plan','bestVal_plan','allV_plan','allX_plan','allVs_plan','allVd_plan');
     elseif z == 1
         file_name = strcat('Results/Results_SDP_expansion/BestPlan_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        save(file_name, 'bestAct_plan','bestVal_plan','allV_plan','allX_plan','allVs_plan','allVd_plan');
+        %save(file_name, 'bestAct_plan','bestVal_plan','allV_plan','allX_plan','allVs_plan','allVd_plan');
     end
         
 % 4. Run the SDP and forward simulation with the optimal dam sizes
@@ -252,13 +252,13 @@ for z=1:2 % the adaptive and non-adaptive policies
 
     bestAct = x;
     
-    run('multiflex_sdp_climate_StaticFlex_DetT_Nov2021_cprime');
+    run('multiflex_sdp_climate_StaticFlex_DetT_Nov2021');
     if z == 2
         file_name = strcat('Results/Results_SDP_expansion/BestFlexStaticPlan_adaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        save(file_name, 'bestAct', 'V', 'X','action', 'totalCostTime','damCostTime','C_state','P_state','Vs','Vd')
+        %save(file_name, 'bestAct', 'V', 'X','action', 'totalCostTime','damCostTime','C_state','P_state','Vs','Vd')
     elseif z == 1
         file_name = strcat('Results/Results_SDP_expansion/BestFlexStaticPlan_nonadaptive_cp', regexprep(strrep(string(c_prime), '.', ''), {'-0'}, {''}),'_g7_percFlex',regexprep(strrep(string(x_6), '.', ''), {'-0'}, {''}),'_percExp',regexprep(strrep(string(x_7), '.', ''), {'-0'}, {''}),'_disc',string(disc),'_50PercExpCapOr150');
-        save(file_name, 'bestAct', 'V', 'X', 'action', 'totalCostTime','damCostTime','C_state','P_state','Vs','Vd')
+        %save(file_name, 'bestAct', 'V', 'X', 'action', 'totalCostTime','damCostTime','C_state','P_state','Vs','Vd')
     end
     
 end

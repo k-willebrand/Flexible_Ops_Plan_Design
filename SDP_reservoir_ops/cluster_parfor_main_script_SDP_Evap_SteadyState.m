@@ -34,31 +34,27 @@
 
 clear all;
 
-%cd('C:/Users/kcuw9/Documents/Fletcher_2019_Learning_Climate/SDP_reservoir_ops')
-
 if ~isempty(getenv('SLURM_JOB_ID'))
     projpath = '/home/users/keaniw/Fletcher_2019_Learning_Climate';
     jobid = getenv('SLURM_JOB_ID');
 else
     % set local path
-    projpath = 'C:/Users/kcuw9/Documents/Research/Kenya Project/Project Code/Flexible_Ops_Plan_Design'; 
+    projpath = 'C:/Users/keaniw/Documents/Research/Kenya Project/Project Code/Flexible_Ops_Plan_Design'; 
     jobid = 'na';
 end
 
 addpath(genpath(projpath))
-addpath('data')
-addpath('SDP_code')
-addpath('SDP_reservoir_ops')
 
 % folder to save intermediate output files
 date = '031122'; % set date for save name
-fol = strcat(projpath,'/outputs'); 
-mkdir(fol) % folder to save intermediate output files
+fol = strcat('SDP_reservoir_ops/outputs'); 
+mkdir(fol) % folder to save intermediate output files for future post-processing!
 
 %% Set run parameters for shortage cost calculations
 
 % Define reservoir capacities (can be an array of capacities)
-storage_vals = [30:10:150]; % set reservoir capacities (MCM)
+% tip: submit multiple jobs with different paritions of entire capacity range 
+storage_vals = [30:10:150]; % set reservoir capacities (MCM).
 
 % descritized temperature and precipitation state space
 s_T_abs = [26.25, 26.75, 27.25, 27.95, 28.8]; % deg. C
@@ -81,7 +77,7 @@ for ss=1:length(storage_vals)
     storage = storage_vals(ss); % reservoir capacity (MCM)
     dead_storage = 20; % MCM
     
-    parfor s_P = 1:num_P_states %18:49 %1:num_P_states
+    for s_P = 1:num_P_states % set 18:49 to only consider 66-97 mm/mo
    
         P_state = s_P;
         
