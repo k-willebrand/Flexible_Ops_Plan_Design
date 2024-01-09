@@ -78,7 +78,7 @@ This model uses the Mwache Dam in Kenya as a case study.
    
    This is the primary script that defines the infrastructure planning SDP. 
    The parameter setup for the file defines parameter and inputs defined in `Multiflex_Wrapper_Nov2021_cprime.m`. 
-   The run parameters specify which whether to run different components of the model. 
+   The run parameters specify whether to run different components of the model. 
 
 
 2. `Multiflex_Wrapper_Nov2021_cprime.m`:
@@ -87,10 +87,10 @@ This model uses the Mwache Dam in Kenya as a case study.
    The script is a wrapper that iteratively runs `multiflex_sdp_climate_StaticFlex_DetT_Nov2021`. 
    For one set of cost model parameters (c' and discount rate can be an array), the script does the following:
 
-      1. Find the optimal flexible design dam size (with static and flexible operations) 
-      2. Find the optimal static dam size (with static and flexible operations) 
-      3. Find the optimal flexible planned dam (with static and flexible operations) 
-      4. Run and save the forward simulation results for each of the with the six flexible/static infrastructure alternatives
+      1. Finds the optimal flexible design dam size (with static and flexible operations) 
+      2. Finds the optimal static dam size (with static and flexible operations) 
+      3. Finds the optimal flexible planned dam (with static and flexible operations) 
+      4. Runs and saves the forward simulation results for each of the with the six flexible/static infrastructure alternatives
 
 
 ### Reservoir operation SDP
@@ -101,7 +101,7 @@ This model uses the Mwache Dam in Kenya as a case study.
    operations using SDP based on Giuliani et al. (2016). This script is parallized. Multiple jobs can be submitted to high performance computing clusters 
    (e.g., across different dam capacities to effeciently optimize and simulate operating policies across 
    different discrete climate states). Postprocessing is then performed on intermediate simulated reservoir operating 
-   files to save results in a file format compatible with the infrastructure planning SDP code.
+   files to save results in a file format compatible with the infrastructure planning SDP.
 
 
 2. `cluster_main_script_SDP_postProcessing.m`
@@ -111,7 +111,9 @@ This model uses the Mwache Dam in Kenya as a case study.
    infrastructure planning SDP.
 
 
-3. `Results/Results_SDP_reservoir_ops`: folder containing previously calculated expected shortage costs for 
+3. `Results/Results_SDP_reservoir_ops`
+   
+   This folder contains previously calculated expected shortage costs for 
    each candidate dam capacity under adaptive (flexible) and non-adaptive (static) operations. These files are used when
    running the infrastructure planning SDP with previously calcuated results from the reservoir operation SDP (recommended).
 
